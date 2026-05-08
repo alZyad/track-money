@@ -1,0 +1,42 @@
+:root {
+  /* Pastel dark theme */
+  --bg: #1a1822;
+  --surface: #242131;
+  --surface-hover: #2c2939;
+  --ink: #ede9f5;
+  --ink-soft: #a8a3bc;
+  --border: #332f44;
+  --border-strong: #43405a;
+
+  --accent-lavender: #c5b3e0;
+  --accent-lavender-soft: #3a3252;
+  --accent-mint: #b8e0cf;
+  --accent-peach: #f4c9a8;
+  --accent-blush: #f1c0cc;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--ink);
+  background: var(--bg);
+
+  color-scheme: dark only;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+button {
+  font-family: inherit;
+}
