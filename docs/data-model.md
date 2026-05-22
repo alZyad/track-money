@@ -78,22 +78,33 @@ const DEFAULT_CATEGORIES: Category[] = [
 
 ## `Workspace`
 
-Top-level user state. From v0.5 persisted in Google Drive; before that, in-memory only.
+Top-level user state. Persisted in the browser from v0.2.1 (localStorage +
+IndexedDB hybrid — see ADR-0008); replaced wholesale by Google Drive at
+v0.5.
 
 ```ts
 type Workspace = {
-  statements: Record<`${number}-${string}`, StoredStatement>  // key = "YYYY-MM"
+  schemaVersion: 1
+  statement: PersistedStatement | null   // single Statement; replaces on new upload
   categories: Category[]
 }
 
-type StoredStatement = {
-  pdfBlob: Blob       // original PDF, kept verbatim
-  pdfHash: string     // SHA-256 of the bytes, for duplicate detection
+type PersistedStatement = {
+  pdfHash: string     // SHA-256 hex; keys the PDF blob in IndexedDB
   statement: Statement
 }
 ```
 
-Note: there is no `refinements` field and no `rules` field. Categorisation is matcher-only (see ADR-0006); matchers live inside `Category.matchers`.
+Persistence layout (v0.2.1):
+
+- `localStorage["track-money:workspace"]` holds the JSON of `Workspace` above.
+- IndexedDB store `pdfs` holds raw PDF `Blob`s keyed by `pdfHash`. Written
+  on upload as a backup; not read during normal app operation.
+
+Note: there is no `refinements` field and no `rules` field. Categorisation
+is matcher-only (see ADR-0006); matchers live inside `Category.matchers`.
+Only one Statement is ever persisted at a time; uploading a new PDF wipes
+the previous Statement (both stores) before writing.
 
 ## What's implemented today (MVP, post-v0.1)
 

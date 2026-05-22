@@ -75,19 +75,40 @@ When the user adds or edits a matcher:
 - **Duplicate across Categories**: allowed. Surfaces in the conflicts section.
 - **Zero current matches**: accepted, but the matcher row gets a small icon with hover-tooltip "Matches 0 current Txs" so the user knows.
 
-## Statement upload conflict resolution (Drive era)
+## Statement upload (v0.2.1 — browser persistence)
 
-On PDF upload, derive `(year, month)` from the parsed `periodEnd`.
+Per ADR-0008, only one Statement is persisted at a time. Upload always
+replaces.
 
-| State of Workspace | Action |
-|---|---|
-| No Statement for `(year, month)` | Accept and persist. |
-| Statement exists; **byte-level hash matches** the stored PDF | Reject as duplicate. |
-| Statement exists; **hash differs** | Prompt: "Replace the existing `YYYY-MM` Statement with this one?" |
+1. Parse the new PDF.
+2. Compute `pdfHash` = SHA-256 of the byte stream.
+3. Write Workspace JSON to localStorage immediately (new `statement` field
+   pointing at the new `pdfHash`). Categories + matchers carry across
+   unchanged.
+4. Delete the previous PDF blob from IndexedDB (if any).
+5. Write the new blob to IndexedDB. Retry twice on failure; if it still
+   fails, surface a toast — the app continues working from the Workspace
+   JSON, but the backup is missing.
 
-On replace: re-parse the new PDF. Categorisation is automatic via matchers — no per-Tx state to migrate. (Pre-ADR-0006 this flow had to map old Refinements to new Txs by `txId`; that step no longer applies.)
+Re-upload of the same `pdfHash` is treated as a no-op replace (Workspace
+JSON rewritten identically; IDB blob rewritten). No dedup prompt.
 
-Pre-Drive: not applicable. Each session starts empty.
+## Boot (v0.2.1)
+
+1. Read `localStorage["track-money:workspace"]` synchronously.
+2. If empty → first-run upload screen.
+3. If JSON.parse fails OR `schemaVersion !== 1` → wipe both stores, show
+   error toast, fall through to first-run screen.
+4. Otherwise hydrate the in-memory Workspace from the JSON.
+5. Asynchronously check IndexedDB for the `pdfHash` blob. If missing,
+   show a warn toast (data still works; backup gone).
+
+## Statement upload conflict resolution (Drive era, v0.5+)
+
+Deferred until Drive lands. The v0.5 model will keep multiple Statements
+keyed by `(year, month)`, replacing the single-Statement model from
+v0.2.1. Conflict policy (hash match → duplicate; hash differs → replace
+prompt) will land alongside that change.
 
 ## AI pre-categorization (v0.6+)
 

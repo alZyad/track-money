@@ -36,9 +36,10 @@ Solo: me. Single bank account, French personal finances.
 
 - **MVP (now)**: Page 1 only. Parser + table. In-memory only.
 - **v0.2**: Page 2. Categorization (manual). Still in-memory.
+- **v0.2.1**: Browser persistence (hybrid localStorage + IndexedDB). Single Statement only; new upload replaces. Replaced wholesale by Drive at v0.5 — see ADR-0008.
 - **v0.3**: Page 3. Monthly pie chart.
-- **v0.4**: Page 4. Multi-month evolution charts (still session-scoped — useful only if user uploads several PDFs in the same session).
-- **v0.5**: Google OAuth + Drive storage. First persistence layer. Stores: PDFs, refinements, category taxonomy, per-counterparty rules. Cross-month memory becomes possible.
+- **v0.4**: Page 4. Multi-month evolution charts (still single-statement-persisted; multi-statement is in-session only).
+- **v0.5**: Google OAuth + Drive storage. Migrates v0.2.1 browser storage into Drive on first auth and disables browser persistence. Cross-month memory becomes possible.
 - **v0.6**: Claude API integration for AI pre-categorization on upload.
 
 ## Success

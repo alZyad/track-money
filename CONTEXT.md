@@ -53,7 +53,7 @@ A virtual UI grouping (not a persisted Category) for Transactions whose `transac
 _Avoid_: unknown, other, misc (Misc is a real Category — see below)
 
 **Workspace**:
-The user's complete state: Statements + Category taxonomy (with their matchers). Persisted in Google Drive from v0.5; before that, in-memory only.
+The user's complete state: the currently loaded Statement + Category taxonomy (with their matchers). Persisted in the browser from v0.2.1 (localStorage + IndexedDB — see ADR-0008); migrated wholesale to Google Drive at v0.5. Pre-v0.2.1: in-memory only.
 _Avoid_: account (this is single-user; no auth concept of account), profile, store
 
 ## Relationships
@@ -65,7 +65,7 @@ _Avoid_: account (this is single-user; no auth concept of account), profile, sto
 - A **Category** owns zero or more **Matchers**
 - A **Category** belongs to at most one parent **Category** (forming a **Subcategory**)
 - A **Transaction** is assigned to the **Category** whose **Matcher** is the longest substring of its `transactionIdentifier`; with no match, the Tx is **Uncategorised**
-- A **Workspace** owns many **Statements** and **Categories**
+- A **Workspace** owns at most one **Statement** at a time (pre-v0.5) and many **Categories**
 
 ## Invariants
 

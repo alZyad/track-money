@@ -14,6 +14,16 @@ Working notes from grilling sessions. Resolved questions live in `CONTEXT.md`, `
 
 _(none)_
 
+## v0.2.1 — Browser persistence
+
+Resolved — see `docs/adr/0008-browser-persistence.md`. Carry-overs:
+
+- [ ] **Persistence status indicator** (top-right corner): visual surface
+  for "persistence healthy / write failing / backup missing" state. User
+  will spec the details when v0.2.1 lands.
+- [ ] **IDB helper choice**: ~50 LOC inline wrapper vs pull in `idb-keyval`
+  (~1 KB gzipped). Decide at impl time.
+
 ## v0.2 — Refinement page
 
 _(all resolved — see CONTEXT.md, docs/data-model.md, docs/processes.md, docs/adr/0006-matcher-only-categorisation.md)_
@@ -64,3 +74,5 @@ Deferred for later versions:
 - Default categories all typed (`expense` / `income`), all deletable, all ship empty — see `CONTEXT.md` § Default categories.
 - Category.type required; direction mismatch hard-blocked at picker — see `CONTEXT.md` § Invariants.
 - **v0.2 grill (Refinement page)**: matcher-only model (no `Refinement` / `CounterpartyRule` entities); side panel right-collapsible is the advanced rule manager; inline Tx picker = "add matcher to Category" sugar; Tx list grouped by Category with Uncategorised-expense/income pinned top; direction-clustered, amount-desc ordering; bulk-select via checkboxes; matcher validation (lowercase, trim, min 2, dedup within Cat, allow cross-Cat with conflict warnings); Misc-expense / Misc-income added as defaults distinct from Uncategorised UI groups — see `docs/adr/0006-matcher-only-categorisation.md`.
+- **Mixed Category type** (ADR-0007): `Category.type ∈ { expense, income, mixed }`. Default `Misc` collapses into a single mixed Category. Inline picker shows two sections (primary direction + Mixed). Refinement page groups: expense → income → mixed clusters.
+- **v0.2.1 grill (browser persistence)**: hybrid localStorage (Workspace JSON, immediate writes) + IndexedDB (write-once PDF backup); single-Statement-at-a-time, upload replaces both stores; corrupt/schema-mismatch boot → wipe + toast; missing IDB blob → load + warn toast; no user reset action; 2-retry on backup write failure → toast; new toast system; persistence indicator deferred. See `docs/adr/0008-browser-persistence.md`.
