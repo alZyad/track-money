@@ -1,0 +1,28 @@
+src/lib/Table.svelte
+  s_3b9fd6817b5060::t_203e187f75f550 108,111,119-120,122,125,127-128
+src/lib/Upload.svelte
+  s_3b9fd6817b5060::t_95e2ebbdf80660 69
+  s_3b9fd6817b5060::t_3c3d22f83fd26b 66,70,74,90
+src/App.svelte
+  s_3b9fd6817b5060::t_40f099dcdbd9c1 144
+  s_3b9fd6817b5060::t_d7c1c1c01bba56 119
+  s_3b9fd6817b5060::t_4e1266c0e532a7 136
+src/app.css
+  s_3b9fd6817b5060::t_4a84b36e89d709 1-19,21-78,80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "623ba7523df3876dc1e5e4a5b101b7fb48e59155",
+  "prompts": {},
+  "sessions": {
+    "s_3b9fd6817b5060": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c6ae3cc-1322-44da-95fb-ad91d5f9d49c",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
