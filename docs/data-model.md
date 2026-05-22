@@ -41,57 +41,39 @@ type TxType =
   | 'OTHER'
 ```
 
-## `Refinement`
-
-User's category assignment for a Tx. Mutable. Layered on top of the Tx.
-
-```ts
-type Refinement = {
-  txId: string         // SHA1 — see docs/processes.md § Tx identity
-  categoryId: string
-}
-```
-
 ## `Category`
 
-A budgetary bucket. Default set ships with the app; user-extensible.
+A budgetary bucket. Owns its matchers directly. Default set ships with the app; user-extensible.
 
 ```ts
 type Category = {
   id: string
   name: string
-  parentId?: string              // present iff this is a subcategory
-  type?: 'expense' | 'income'    // omit for "either"
+  parentId?: string                              // present iff this is a subcategory
+  type: 'expense' | 'income' | 'mixed'           // required — see ADR-0006, ADR-0007
+  matchers: string[]                             // substrings of transactionIdentifier; lowercase
 }
 
 // type ↔ Tx.direction mapping:
 //   'expense' → only Txs with direction 'out'
 //   'income'  → only Txs with direction 'in'
+//   'mixed'   → both directions accepted; the Category aggregates in + out together
 ```
 
-Default categories (see `CONTEXT.md` § Default categories for semantics):
+A Tx is assigned to the Category whose matcher (across all Categories) is the longest substring of `tx.transactionIdentifier`. Length ties broken by Category array order. No match → Uncategorised UI group.
+
+Default categories (see `CONTEXT.md` § Default categories). All ship with `matchers: []`.
 
 ```ts
 const DEFAULT_CATEGORIES: Category[] = [
-  { id: 'rent',          name: 'Rent',          type: 'expense' },
-  { id: 'groceries',     name: 'Groceries' },
-  { id: 'restaurant',    name: 'Restaurant' },
-  { id: 'subscriptions', name: 'Subscriptions' },
-  { id: 'transport',     name: 'Transport' },
-  { id: 'salary',        name: 'Salary',        type: 'income' },
-  { id: 'other',         name: 'Other' },
+  { id: 'rent',          name: 'Rent',          type: 'expense', matchers: [] },
+  { id: 'groceries',     name: 'Groceries',     type: 'expense', matchers: [] },
+  { id: 'restaurant',    name: 'Restaurant',    type: 'expense', matchers: [] },
+  { id: 'subscriptions', name: 'Subscriptions', type: 'expense', matchers: [] },
+  { id: 'transport',     name: 'Transport',     type: 'expense', matchers: [] },
+  { id: 'salary',        name: 'Salary',        type: 'income',  matchers: [] },
+  { id: 'misc',          name: 'Misc',          type: 'mixed',   matchers: [] },
 ]
-```
-
-## `CounterpartyRule`
-
-Learned mapping from a `transactionIdentifier` substring to a Category.
-
-```ts
-type CounterpartyRule = {
-  transactionIdentifierMatcher: string  // substring of identifier; default = full identifier
-  categoryId: string
-}
 ```
 
 ## `Workspace`
@@ -101,9 +83,7 @@ Top-level user state. From v0.5 persisted in Google Drive; before that, in-memor
 ```ts
 type Workspace = {
   statements: Record<`${number}-${string}`, StoredStatement>  // key = "YYYY-MM"
-  refinements: Refinement[]
   categories: Category[]
-  rules: CounterpartyRule[]
 }
 
 type StoredStatement = {
@@ -113,6 +93,8 @@ type StoredStatement = {
 }
 ```
 
-## What's implemented today (MVP)
+Note: there is no `refinements` field and no `rules` field. Categorisation is matcher-only (see ADR-0006); matchers live inside `Category.matchers`.
 
-Only `Statement` and `Tx` are produced by the parser (`src/lib/parsePdf.ts`). The other types are shape-defined here but have no runtime equivalent until v0.2+.
+## What's implemented today (MVP, post-v0.1)
+
+Only `Statement` and `Tx` are produced by the parser (`src/lib/parsePdf.ts`). `Category` and `Workspace` are shape-defined here; their runtime representation lands in v0.2.

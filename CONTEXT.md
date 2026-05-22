@@ -36,28 +36,24 @@ _Avoid_: key, signature, fingerprint, tx-id
 The full LIBELLE block of a Transaction, joined with newlines, kept verbatim for safekeeping and audit.
 _Avoid_: raw, blob, original
 
-**Refinement**:
-The user's category assignment for a Transaction: `{ txId, categoryId }`. Layered on top of the Tx; never mutates it.
-_Avoid_: edit, override, annotation, classification
-
 **Category**:
-A budgetary bucket (e.g. Groceries, Rent). Each refined Tx has at most one Category. Taxonomy is user-editable and may have one level of subcategories.
+A budgetary bucket (e.g. Groceries, Rent). Each Tx whose identifier is matched by one of a Category's matchers belongs to that Category. Taxonomy is user-editable and may have one level of subcategories.
 _Avoid_: tag, label, bucket, group
 
 **Subcategory**:
 A Category whose `parentId` references another Category. One level deep, no further nesting.
 _Avoid_: child, sub-tag
 
-**Counterparty rule**:
-A learned `(transactionIdentifierMatcher → categoryId)` mapping that pre-fills a Category for incoming Transactions whose `transactionIdentifier` contains the matcher.
-_Avoid_: heuristic, classifier, mapping
+**Matcher** (`transactionIdentifierMatcher`):
+A substring of a `transactionIdentifier`, owned by a Category. Default = the full identifier (exact match). User shortens it to group similar Transactions (e.g. `aldi` covers all ALDI stores). A Tx is assigned to the Category whose matcher (across all Categories) is the longest substring of its identifier.
+_Avoid_: pattern, regex, glob, rule (legacy term — see ADR-0006)
 
-**transactionIdentifierMatcher**:
-A substring of a `transactionIdentifier`. Default = the full identifier (exact match). User can shorten it to group similar transactions (e.g. `aldi` covers all ALDI stores).
-_Avoid_: pattern, regex, glob
+**Uncategorised**:
+A virtual UI grouping (not a persisted Category) for Transactions whose `transactionIdentifier` is not matched by any matcher. Split into `Uncategorised-expense` and `Uncategorised-income` in the UI. Empties as the user adds matchers.
+_Avoid_: unknown, other, misc (Misc is a real Category — see below)
 
 **Workspace**:
-The user's complete state: Statements + Refinements + Category taxonomy + Counterparty rules. Persisted in Google Drive from v0.5; before that, in-memory only.
+The user's complete state: Statements + Category taxonomy (with their matchers). Persisted in Google Drive from v0.5; before that, in-memory only.
 _Avoid_: account (this is single-user; no auth concept of account), profile, store
 
 ## Relationships
@@ -66,11 +62,10 @@ _Avoid_: account (this is single-user; no auth concept of account), profile, sto
 - A **Statement** covers exactly one **Period**
 - A **Transaction** has exactly one **Direction**
 - A **Transaction** has exactly one **Counterparty** and at most one **BankMemo**
-- A **Transaction** has at most one **Refinement** (a Tx with no Refinement is uncategorised)
-- A **Refinement** references exactly one **Category**
+- A **Category** owns zero or more **Matchers**
 - A **Category** belongs to at most one parent **Category** (forming a **Subcategory**)
-- A **Counterparty rule** maps to exactly one **Category**
-- A **Workspace** owns many **Statements**, **Refinements**, **Categories**, and **Counterparty rules**
+- A **Transaction** is assigned to the **Category** whose **Matcher** is the longest substring of its `transactionIdentifier`; with no match, the Tx is **Uncategorised**
+- A **Workspace** owns many **Statements** and **Categories**
 
 ## Invariants
 
@@ -78,10 +73,11 @@ _Avoid_: account (this is single-user; no auth concept of account), profile, sto
 - A **Transaction**'s amount is always positive; sign comes from **Direction**.
 - For each **Statement**: `oldBalance + sum(in amounts) - sum(out amounts) = newBalance` (within rounding).
 - Currency is always EUR. PDF format: `1 072,53` (space = thousands sep, comma = decimal).
-- A **Refinement** survives re-parsing the same Statement, because **Tx identity** is deterministic (see `docs/processes.md`).
-- A **Counterparty rule**'s matcher is always a substring of some `transactionIdentifier`; both are lowercase.
-- A **Category** with `type: 'expense'` only accepts `out` Txs; `type: 'income'` only accepts `in` Txs; omit `type` for either. Default `Rent` is `expense`; default `Salary` is `income`.
-- **Refinement assignment is hard-blocked on type mismatch**: a Refinement linking a Tx to a Category whose `type` contradicts the Tx's `direction` is rejected (UI hides incompatible Categories from the picker; programmatic creation throws).
+- A **Matcher** is always lowercase, ≥ 2 characters, and a substring of some `transactionIdentifier`.
+- Matchers may overlap across Categories. Resolution: longest substring wins; ties broken by Category array order. Overlaps are surfaced in the side panel conflicts section.
+- **`Category.type` is required** (`'expense'`, `'income'`, or `'mixed'`). `'expense'` only accepts `out` Txs; `'income'` only accepts `in` Txs; `'mixed'` accepts both and aggregates them in a single group.
+- **Direction mismatch is hard-blocked at the picker**: the inline Category picker on a Tx row filters to Categories that accept its direction (expense or mixed for `out`; income or mixed for `in`). A user cannot assign a Tx to an incompatible Category.
+- **Categorisation is matcher-only** (see ADR-0006). There is no per-Tx override layer.
 
 ## Transaction types (bank prefixes)
 
@@ -103,19 +99,23 @@ Each **Transaction** has a `type` derived from the first word(s) of its LIBELLE 
 
 ## Default categories
 
-Shipped with the app. User can rename, delete, or add to them.
+Shipped with the app. All are deletable. All ship with **no matchers** — the user populates them as they go. Types are required.
 
 | Name | Type | Notes |
 |---|---|---|
 | Rent | `expense` | Housing rent only. |
-| Groceries | either | Supermarkets, food retail. |
-| Restaurant | either | Eating out, food delivery, cafés. |
-| Subscriptions | either | Broad bucket: any recurring payment (streaming, gym, bank fees, insurance, telecom). User splits via subcategories if desired. |
-| Transport | either | Navigo, SNCF, flights, fuel, ride-hailing. |
+| Groceries | `expense` | Supermarkets, food retail. |
+| Restaurant | `expense` | Eating out, food delivery, cafés. |
+| Subscriptions | `expense` | Broad bucket: any recurring payment (streaming, gym, bank fees, insurance, telecom). User splits via subcategories if desired. |
+| Transport | `expense` | Navigo, SNCF, flights, fuel, ride-hailing. |
 | Salary | `income` | Primary work income. |
-| Other | either | Fallback for anything not categorised. |
+| Misc | `mixed` | User-owned miscellaneous bucket. Accepts both directions and sums them together. Empty by default. |
+
+Edge cases that don't fit a single-direction default (e.g. a refund from a restaurant) land in **Misc** until the user creates a dedicated Category.
 
 `Subscriptions` intentionally swallows what some apps split (Insurance, Banking fees, Entertainment); the user subdivides via Subcategories, not via top-level Categories.
+
+Note: **Misc** ≠ **Uncategorised**. Misc is a real Category the user can populate with matchers. Uncategorised is the virtual UI group for Txs no matcher matched.
 
 ## Excluded rows
 
@@ -130,14 +130,17 @@ These appear in the LIBELLE column on the PDF but are **not Transactions** — t
 
 > **User:** "Why is the Bouygues mobile bill in Subscriptions but my Bouygues landline isn't?"
 >
-> **App:** "Both lines share the **Counterparty** `Bouygues Telecom`, but their **BankMemos** differ (`07xxxxx363` vs `09xxxxx818`). That makes their **transactionIdentifiers** distinct, so they map to two separate **Counterparty rules**. You categorised the mobile one but not the landline."
+> **App:** "Both lines share the **Counterparty** `Bouygues Telecom`, but their **BankMemos** differ (`07xxxxx363` vs `09xxxxx818`). That makes their **transactionIdentifiers** distinct. The Subscriptions Category has a matcher that hits the mobile identifier but not the landline one. Add a second matcher (or shorten the existing one) to cover both."
 
 > **User:** "Can I make a category called `Refunds` for incoming money like rent deposits?"
 >
-> **App:** "Yes — create a **Category** named Refunds with `type: 'income'`. The rent-deposit Transaction will fit; assigning it via a **Refinement** also creates a **Counterparty rule** so future deposits auto-categorise."
+> **App:** "Yes — create a **Category** named Refunds with `type: 'income'`. Pick the rent-deposit Tx and assign it to Refunds; that adds a matcher (the Tx's full `transactionIdentifier`) to Refunds, so future identical deposits auto-categorise. Shorten the matcher in the side panel to broaden the match."
 
 ## Flagged ambiguities
 
-- **"label"** was previously used to mean both a user-editable text and the LIBELLE column from the PDF. Resolved: there is no user-editable label (Refinements only carry a categoryId). The PDF's LIBELLE block decomposes into **Counterparty** + **BankMemo**.
+- **"label"** was previously used to mean both a user-editable text and the LIBELLE column from the PDF. Resolved: there is no user-editable label. The PDF's LIBELLE block decomposes into **Counterparty** + **BankMemo**.
 - **"memo"** alone is too generic (could imply user-added). Resolved: the bank-provided memo is **BankMemo** (camelCase `bankMemo` in code, but conceptually distinct).
 - **"category"** vs **"subcategory"**: a Subcategory is just a Category with a `parentId`. Same entity, different role.
+- **"rule"** vs **"matcher"**: prior model had a `CounterpartyRule` entity. Resolved (ADR-0006): rules dissolve into `Matcher` strings owned by Categories. The word "rule" should not appear in new code or docs.
+- **"Uncategorised"** vs **"Misc"**: Uncategorised is the virtual UI group for Txs no matcher matched. Misc-expense / Misc-income are real (default) Categories. Don't conflate.
+- **"Refinement"**: removed (ADR-0006). The word should not appear in new code or docs.

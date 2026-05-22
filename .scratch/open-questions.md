@@ -16,10 +16,14 @@ _(none)_
 
 ## v0.2 — Refinement page
 
-- [ ] **Page 2 ergonomics**: bulk-select Txs to assign a category? Filter by `transactionIdentifier`? Where does the rule editor live (inline per-row, side panel, separate page)?
-- [ ] **Rule creation UX**: when assigning a category, how does the user shorten the matcher? Auto-suggest substrings? Free-text edit? Preview "this rule will match N other Txs"?
-- [ ] **Uncategorised badge**: how to surface Txs without a Refinement — colour, count, filter?
-- [ ] **Provisional vs confirmed Refinements**: visual distinction so AI/rule auto-fills are obviously different from explicit user choices. Decide once we have AI in scope.
+_(all resolved — see CONTEXT.md, docs/data-model.md, docs/processes.md, docs/adr/0006-matcher-only-categorisation.md)_
+
+Deferred for later versions:
+
+- [ ] **Search / filter on Tx list** (deferred enhancement — recommend single search box, substring match on `transactionIdentifier`).
+- [ ] **Provisional vs confirmed matchers**: needed once AI lands in v0.6 — should AI-suggested matchers be visually distinct (e.g. dashed border) and require user confirmation before being treated as ground truth?
+- [ ] **Drag-to-reorder Categories**: out of scope for v0.2 (defaults are alphabetical within direction cluster, sum-of-amounts desc later). Revisit if user list grows past ~15 categories.
+- [ ] **Subcategory UX**: `parentId` is in the data model but v0.2 ships flat. Decide nesting UX (drag-set parent, indented rendering, rollup behavior) when needed.
 
 ## v0.3 — Monthly visualization
 
@@ -50,12 +54,13 @@ _(none)_
 - [ ] **Other banks**: explicitly out of scope. Re-asses if requested.
 - [ ] **Currency drift**: currently EUR-only. Foreign-currency CB lines lose their original amount (we drop the second line). Acceptable for now.
 
-## Recently resolved (last 24h, for fresh sessions to skim)
+## Recently resolved (for fresh sessions to skim)
 
-- Statement / Tx / Refinement / Category / Workspace shapes — see `docs/data-model.md`.
+- Statement / Tx / Category / Workspace shapes — see `docs/data-model.md`.
 - `transactionIdentifier` algorithm (deterministic, lowercase, `<counterparty> - <bankMemo>`) — see `docs/processes.md` § transactionIdentifier derivation.
-- `transactionIdentifierMatcher` semantics (substring, longest-wins) — see `docs/processes.md` § Counterparty rule matching.
+- Matcher resolution (substring, longest-wins, ties by Category array order) — see `docs/processes.md` § Categorisation.
 - Persistence: in-memory pre-v0.5, Drive only after — see `docs/adr/0005-deferred-decisions.md`.
 - Upload conflict resolution: `(year, month)` + byte-hash — see `docs/processes.md` § Statement upload conflict resolution.
-- Default categories + type-locked Rent (expense) / Salary (income) — see `CONTEXT.md` § Default categories.
-- Q7 resolved: Category.type mismatch is **hard-blocked** at assignment (picker hides incompatible categories) — see `CONTEXT.md` § Invariants.
+- Default categories all typed (`expense` / `income`), all deletable, all ship empty — see `CONTEXT.md` § Default categories.
+- Category.type required; direction mismatch hard-blocked at picker — see `CONTEXT.md` § Invariants.
+- **v0.2 grill (Refinement page)**: matcher-only model (no `Refinement` / `CounterpartyRule` entities); side panel right-collapsible is the advanced rule manager; inline Tx picker = "add matcher to Category" sugar; Tx list grouped by Category with Uncategorised-expense/income pinned top; direction-clustered, amount-desc ordering; bulk-select via checkboxes; matcher validation (lowercase, trim, min 2, dedup within Cat, allow cross-Cat with conflict warnings); Misc-expense / Misc-income added as defaults distinct from Uncategorised UI groups — see `docs/adr/0006-matcher-only-categorisation.md`.

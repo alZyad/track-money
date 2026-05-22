@@ -2,9 +2,9 @@
 
 Algorithms and procedural rules. Domain entities and shapes are in `CONTEXT.md` and `docs/data-model.md`.
 
-## Tx identity
+## Tx identity (legacy, possibly removable)
 
-For a **Refinement** to survive re-parsing the same Statement, each **Transaction** needs a stable identity across runs.
+Originally introduced so per-Tx Refinements could survive re-parsing. With Refinements dissolved (ADR-0006), `txId` is no longer load-bearing for categorisation. May still be useful when v0.5 introduces Drive upload-replace; revisit when implementing that flow.
 
 ```
 txId = SHA1(period | date | amount | direction | transactionIdentifier | indexInStatement)
@@ -30,21 +30,50 @@ Pure string operations on the parsed PDF. No AI, no API calls. Runs offline.
 6. Combine: `bankMemo ? "${counterparty} - ${bankMemo}" : counterparty`.
 7. Lowercase the whole thing.
 
-## Counterparty rule matching
+## Categorisation (matcher resolution)
 
-When categorising a Tx, find the **Counterparty rule** to apply (Drive era only — pre-v0.5 there are no rules):
+For each Tx, decide its Category by scanning matchers across all Categories.
 
-1. Among all rules, keep those whose `transactionIdentifierMatcher` is a substring of `tx.transactionIdentifier` (both already lowercase).
-2. If multiple match, pick the rule with the **longest matcher** (most specific wins).
-3. If none match, the Tx is uncategorised — AI fills in from v0.6 onwards.
+1. Collect candidate matchers: every `matcher ∈ Category.matchers` (across all Categories) such that `matcher` is a substring of `tx.transactionIdentifier`. Both are already lowercase.
+2. Of the candidates, keep those of **maximum length** (most specific wins).
+3. If multiple candidates remain (tie), pick the one belonging to the **earliest Category** in `Workspace.categories` array order. Stable iteration / `Array.prototype.find` gives this for free.
+4. The owning Category of the surviving matcher = the Tx's Category.
+5. If no candidate matched, the Tx is **Uncategorised** (rendered into the `Uncategorised-expense` or `Uncategorised-income` UI group based on `tx.direction`).
 
-## Rule learning (last-write-wins)
+Re-evaluated immediately whenever any Category's `matchers` changes.
 
-When the user assigns or changes a Tx's Category:
+## Inline picker (assigning a Category from a Tx row)
 
-1. Compute the rule key. Default = the full `transactionIdentifier`. The user may shorten it via the rule editor.
-2. Upsert the **Counterparty rule**: if a rule with the same matcher exists, replace its `categoryId`; otherwise create.
-3. Past **Refinements** are not retroactively rewritten. Only future Statements (or future re-categorisations) see the new rule.
+User clicks a Tx row → dropdown lists all Categories whose `type` matches `tx.direction`, organised under a single header. On pick:
+
+1. Append the Tx's full `transactionIdentifier` as a new matcher to the chosen Category.
+2. Apply matcher validation (see below). If validation rejects (e.g. matcher already exists in that Category), no-op silently.
+3. Re-run categorisation. Tx hops to the chosen Category's group in the list.
+
+The picker has no other effect — there is no Refinement entity, no rule object, no precedence layer. It is sugar over "add matcher to Category".
+
+## Side panel (advanced rule management)
+
+Right-side collapsible panel. Top-down structure:
+
+1. List of Categories (expense cluster, then income cluster; within cluster, name asc).
+2. Each Category expandable to its matcher list. Per-matcher actions: edit, delete. Per-Category actions: rename, delete, add matcher.
+3. "+ Add Category" button: name + type (required radio).
+4. Conflicts section at bottom: lists every Tx matched by ≥ 2 matchers from different Categories. Shows the Tx identifier, all matching `(Category, matcher)` pairs, and which one currently wins.
+
+All mutations are immediate. There is no draft / commit step.
+
+## Matcher validation
+
+When the user adds or edits a matcher:
+
+- **Lowercase**: input is auto-lowercased on save.
+- **Trim**: leading/trailing whitespace stripped; internal whitespace preserved.
+- **Min length**: 2 characters.
+- **Empty**: rejected.
+- **Duplicate within the same Category**: rejected silently (no-op).
+- **Duplicate across Categories**: allowed. Surfaces in the conflicts section.
+- **Zero current matches**: accepted, but the matcher row gets a small icon with hover-tooltip "Matches 0 current Txs" so the user knows.
 
 ## Statement upload conflict resolution (Drive era)
 
@@ -56,21 +85,17 @@ On PDF upload, derive `(year, month)` from the parsed `periodEnd`.
 | Statement exists; **byte-level hash matches** the stored PDF | Reject as duplicate. |
 | Statement exists; **hash differs** | Prompt: "Replace the existing `YYYY-MM` Statement with this one?" |
 
-On replace:
-1. Re-parse the new PDF.
-2. Map old Refinements to new Txs by `txId`.
-3. Refinements whose `txId` no longer exists are dropped; surface a notice listing them.
+On replace: re-parse the new PDF. Categorisation is automatic via matchers — no per-Tx state to migrate. (Pre-ADR-0006 this flow had to map old Refinements to new Txs by `txId`; that step no longer applies.)
 
 Pre-Drive: not applicable. Each session starts empty.
 
 ## AI pre-categorization (v0.6+)
 
-After Counterparty-rule matching runs:
+Open: provisional-vs-confirmed UX (matchers from AI vs matchers from user). Deferred — design once AI integration is in scope.
 
-1. Collect Txs with no matching rule.
+Outline:
+
+1. Collect Txs that the matcher resolver returned Uncategorised for.
 2. Send their `transactionIdentifier` (and optionally `amount`, `direction`) to Claude in a single batch request.
 3. Receive suggested `categoryId` per Tx.
-4. Apply as **provisional Refinements** — visually distinct in the UI so the user can accept or override.
-5. User acceptance promotes the provisional Refinement to a regular one and creates the corresponding Counterparty rule (last-write-wins).
-
-Rules always win over AI: the AI never overrides a rule-matched category.
+4. Open question: does AI directly write matchers into the chosen Category, or stage them as "provisional" entries visually distinct in the side panel until the user accepts?
