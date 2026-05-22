@@ -1,0 +1,36 @@
+src/lib/pdfWorker.ts
+  s_3b9fd6817b5060::t_82831b7a20ef4a 1-4
+package.json
+  s_3b9fd6817b5060::t_5eddaad3e0f00e 10-11
+src/lib/parsePdf.ts
+  s_3b9fd6817b5060::t_0ffefe8b65cc51 1-12
+  s_3b9fd6817b5060::t_0a8970f0a01ba5 111-114,116-119
+  s_3b9fd6817b5060::t_1c7143927eec2f 48
+  s_3b9fd6817b5060::t_f192a15f48b69e 190,193-202,204-205
+  s_3b9fd6817b5060::t_d429da71c8d555 203
+  s_3b9fd6817b5060::t_ecacbc6cc11efe 191-192
+.gitignore
+  s_3b9fd6817b5060::t_fef812522cbb13 15-21
+src/main.ts
+  s_3b9fd6817b5060::t_502aa1feb57921 3
+.scratch/diagnose-loop.mjs
+  s_3b9fd6817b5060::t_dd2cd0bcbc41d1 2,8-9
+  s_3b9fd6817b5060::t_7d377d7a0e7a7d 11-14,21-24
+  s_3b9fd6817b5060::t_1ca1796a4af043 1,3-7,10,15-20,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "1f687c7dd4ad22bcb4507783717ffd80cdad2617",
+  "prompts": {},
+  "sessions": {
+    "s_3b9fd6817b5060": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8c6ae3cc-1322-44da-95fb-ad91d5f9d49c",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
