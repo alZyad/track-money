@@ -1,0 +1,39 @@
+docs/processes.md
+  s_0815b0fbb67abb::t_2b2dbde56f6354 5,7,33,35,37-41,43,45,47-76,88,94,96-98,101
+docs/adr/0006-matcher-only-categorisation.md
+  s_0815b0fbb67abb::t_6e01766752854a 1-40
+CONTEXT.md
+  s_0815b0fbb67abb::t_b8340a56b8bc26 102,107-110,118
+  s_0815b0fbb67abb::t_fc3490ddca84b0 65,67-68
+  s_0815b0fbb67abb::t_4c2efb80253d82 112-114
+  s_0815b0fbb67abb::t_83e62c4c3b2a78 141,144-146
+  s_0815b0fbb67abb::t_e6e231b146d14f 40,47-49,51-53,56
+  s_0815b0fbb67abb::t_42e148f3269f41 76-77,80
+  s_0815b0fbb67abb::t_077ec855ff97c1 133,137
+  s_0815b0fbb67abb::t_3cc738df061f55 78-79
+docs/data-model.md
+  s_0815b0fbb67abb::t_db9095c55b09c1 52-54,60
+  s_0815b0fbb67abb::t_8cddd33bc055a9 75
+  s_0815b0fbb67abb::t_554e2b1feb4620 46,63-65,69-74,96-98,100
+docs/adr/0007-mixed-category-type.md
+  s_0815b0fbb67abb::t_b6ad85e0e1d873 1-36
+.scratch/open-questions.md
+  s_0815b0fbb67abb::t_9b161a115685b7 57,59,61,64-66
+  s_0815b0fbb67abb::t_9af09d5b40b44f 19-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "112fe8dc9a37a6660c569a35b0be6d49ab325252",
+  "prompts": {},
+  "sessions": {
+    "s_0815b0fbb67abb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19b612cd-574e-4866-97ef-190dbb864218",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
