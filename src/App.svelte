@@ -1,12 +1,14 @@
 <script lang="ts">
   import Upload from './lib/Upload.svelte'
-  import Table from './lib/Table.svelte'
+  import RefinementPage from './lib/RefinementPage.svelte'
+  import SidePanel from './lib/SidePanel.svelte'
   import { parseStatement, type Statement } from './lib/parsePdf'
 
   let file: File | null = $state(null)
   let statement: Statement | null = $state(null)
   let loading = $state(false)
   let error: string | null = $state(null)
+  let panelOpen = $state(false)
 
   async function handleFile(f: File) {
     file = f
@@ -74,7 +76,12 @@
         </div>
       </section>
 
-      <Table txs={statement.txs} />
+      <RefinementPage
+        txs={statement.txs}
+        panelOpen={panelOpen}
+        onTogglePanel={() => (panelOpen = !panelOpen)}
+      />
+      <SidePanel txs={statement.txs} open={panelOpen} onClose={() => (panelOpen = false)} />
     {/if}
   {/if}
 </main>
