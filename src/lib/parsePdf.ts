@@ -1,7 +1,15 @@
-import * as pdfjs from 'pdfjs-dist'
-import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
-
-pdfjs.GlobalWorkerOptions.workerSrc = workerUrl
+// pdfjs is imported lazily inside parseStatement so we can pick the
+// browser build (main) vs Node build (legacy) at runtime.
+type PdfjsLike = {
+  getDocument: (src: { data: ArrayBuffer | Uint8Array }) => {
+    promise: Promise<{
+      numPages: number
+      getPage: (n: number) => Promise<{
+        getTextContent: () => Promise<{ items: Array<{ str?: string; transform: number[]; width?: number }> }>
+      }>
+    }>
+  }
+}
 
 export type TxType =
   | 'VIR_INST'
@@ -37,8 +45,7 @@ const VDATE_RE = /^\d{2}\.\d{2}\.\d{2}$/
 const AMOUNT_RE = /^-?\d{1,3}(?:\s\d{3})*(?:,\d{2})\.?$/
 const PERIOD_RE = /du\s+(\d{2}\.\d{2}\.\d{4})\s+au\s+(\d{2}\.\d{2}\.\d{4})/
 
-async function loadItems(file: File): Promise<Item[][]> {
-  const buf = await file.arrayBuffer()
+async function loadItems(pdfjs: PdfjsLike, buf: ArrayBuffer | Uint8Array): Promise<Item[][]> {
   const doc = await pdfjs.getDocument({ data: buf }).promise
   const pages: Item[][] = []
   for (let i = 1; i <= doc.numPages; i++) {
@@ -101,15 +108,15 @@ function classify(row: Item[], cols: Cols) {
     deb: [] as Item[],
     cred: [] as Item[],
   }
-  const midDateLib = (cols.date + cols.lib) / 2
-  const midLibVal = (cols.lib + cols.val) / 2
-  const midValDeb = (cols.val + cols.deb) / 2
-  const midDebCred = (cols.deb + cols.cred) / 2
+  // Column LEFT edges. The LIBELLE header label is right-shifted from the
+  // actual LIBELLE column start (data sits well left of the label), so we use
+  // a narrow DATE column and let LIBELLE fill the gap up to VALEUR.
+  const DATE_RIGHT = cols.date + 30
   for (const it of row) {
-    if (it.x < midDateLib) buckets.date.push(it)
-    else if (it.x < midLibVal) buckets.lib.push(it)
-    else if (it.x < midValDeb) buckets.val.push(it)
-    else if (it.x < midDebCred) buckets.deb.push(it)
+    if (it.x < DATE_RIGHT) buckets.date.push(it)
+    else if (it.x < cols.val) buckets.lib.push(it)
+    else if (it.x < cols.deb) buckets.val.push(it)
+    else if (it.x < cols.cred) buckets.deb.push(it)
     else buckets.cred.push(it)
   }
   return buckets
@@ -180,8 +187,22 @@ function buildIdentifier(counterparty: string, bankMemo?: string): string {
   return raw.toLowerCase()
 }
 
-export async function parseStatement(file: File): Promise<Statement> {
-  const pages = await loadItems(file)
+async function defaultPdfjs(): Promise<PdfjsLike> {
+  const g = globalThis as { process?: { versions?: { node?: string } } }
+  const isNode = !!g.process?.versions?.node
+  const mod = isNode
+    ? await import('pdfjs-dist/legacy/build/pdf.mjs' as string)
+    : await import('pdfjs-dist')
+  return mod as unknown as PdfjsLike
+}
+
+export async function parseStatement(
+  input: File | ArrayBuffer | Uint8Array,
+  pdfjs?: PdfjsLike,
+): Promise<Statement> {
+  const buf = input instanceof File ? await input.arrayBuffer() : input
+  const lib = pdfjs ?? (await defaultPdfjs())
+  const pages = await loadItems(lib, buf)
 
   let periodStart = ''
   let periodEnd = ''

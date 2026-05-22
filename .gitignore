@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Local fixtures with personal data (bank statements). Parser harness reads
+# from here but the PDFs themselves are never committed.
+example/
+
+# One-off diagnostic dump scripts.
+.scratch/dump-pdf.mjs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
