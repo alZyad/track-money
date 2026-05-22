@@ -1,0 +1,31 @@
+docs/data-model.md
+  s_0815b0fbb67abb::t_602afd95c91c20 81-83,87-88,92-93,98-107
+docs/PRD.md
+  s_0815b0fbb67abb::t_5ec1c9d3d3477d 39,41-42
+CONTEXT.md
+  s_0815b0fbb67abb::t_2de9fbfdaaba79 56
+  s_0815b0fbb67abb::t_25ea893e519165 68
+docs/processes.md
+  s_0815b0fbb67abb::t_5e5e90593bac54 78-111
+docs/adr/0008-browser-persistence.md
+  s_0815b0fbb67abb::t_a2b691e319a556 1-103
+.scratch/open-questions.md
+  s_0815b0fbb67abb::t_57c6739126135f 17-26
+  s_0815b0fbb67abb::t_b41cf4f4e7b713 77-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "c25d6008d10fd02089b520f6fab855af17565c8a",
+  "prompts": {},
+  "sessions": {
+    "s_0815b0fbb67abb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19b612cd-574e-4866-97ef-190dbb864218",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
