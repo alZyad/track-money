@@ -80,7 +80,8 @@ _Avoid_: account (this is single-user; no auth concept of account), profile, sto
 - Currency is always EUR. PDF format: `1 072,53` (space = thousands sep, comma = decimal).
 - A **Refinement** survives re-parsing the same Statement, because **Tx identity** is deterministic (see `docs/processes.md`).
 - A **Counterparty rule**'s matcher is always a substring of some `transactionIdentifier`; both are lowercase.
-- The default **Categories** `Rent` and `Salary` are direction-locked: `Rent` is `out`-only, `Salary` is `in`-only.
+- A **Category** with `type: 'expense'` only accepts `out` Txs; `type: 'income'` only accepts `in` Txs; omit `type` for either. Default `Rent` is `expense`; default `Salary` is `income`.
+- **Refinement assignment is hard-blocked on type mismatch**: a Refinement linking a Tx to a Category whose `type` contradicts the Tx's `direction` is rejected (UI hides incompatible Categories from the picker; programmatic creation throws).
 
 ## Transaction types (bank prefixes)
 
@@ -104,15 +105,15 @@ Each **Transaction** has a `type` derived from the first word(s) of its LIBELLE 
 
 Shipped with the app. User can rename, delete, or add to them.
 
-| Name | Direction | Notes |
+| Name | Type | Notes |
 |---|---|---|
-| Rent | `out` only | Housing rent only. |
-| Groceries | any | Supermarkets, food retail. |
-| Restaurant | any | Eating out, food delivery, cafés. |
-| Subscriptions | any | Broad bucket: any recurring payment (streaming, gym, bank fees, insurance, telecom). User splits via subcategories if desired. |
-| Transport | any | Navigo, SNCF, flights, fuel, ride-hailing. |
-| Salary | `in` only | Primary work income. |
-| Other | any | Fallback for anything not categorised. |
+| Rent | `expense` | Housing rent only. |
+| Groceries | either | Supermarkets, food retail. |
+| Restaurant | either | Eating out, food delivery, cafés. |
+| Subscriptions | either | Broad bucket: any recurring payment (streaming, gym, bank fees, insurance, telecom). User splits via subcategories if desired. |
+| Transport | either | Navigo, SNCF, flights, fuel, ride-hailing. |
+| Salary | `income` | Primary work income. |
+| Other | either | Fallback for anything not categorised. |
 
 `Subscriptions` intentionally swallows what some apps split (Insurance, Banking fees, Entertainment); the user subdivides via Subcategories, not via top-level Categories.
 
@@ -133,7 +134,7 @@ These appear in the LIBELLE column on the PDF but are **not Transactions** — t
 
 > **User:** "Can I make a category called `Refunds` for incoming money like rent deposits?"
 >
-> **App:** "Yes — create a **Category** named Refunds with **Direction** `in` only. The rent-deposit Transaction will fit; assigning it via a **Refinement** also creates a **Counterparty rule** so future deposits auto-categorise."
+> **App:** "Yes — create a **Category** named Refunds with `type: 'income'`. The rent-deposit Transaction will fit; assigning it via a **Refinement** also creates a **Counterparty rule** so future deposits auto-categorise."
 
 ## Flagged ambiguities
 

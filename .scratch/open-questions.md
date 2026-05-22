@@ -12,7 +12,7 @@ Working notes from grilling sessions. Resolved questions live in `CONTEXT.md`, `
 
 ## Currently in flight
 
-- [ ] **Q7 — Direction constraints per category**: enforce vs warn? Recommendation made (enforce via optional `allowedDirection` field on `Category`); the data model already includes the field, but the policy decision (hard block vs soft warning at assignment time) is not finalised.
+_(none)_
 
 ## v0.2 — Refinement page
 
@@ -57,4 +57,5 @@ Working notes from grilling sessions. Resolved questions live in `CONTEXT.md`, `
 - `transactionIdentifierMatcher` semantics (substring, longest-wins) — see `docs/processes.md` § Counterparty rule matching.
 - Persistence: in-memory pre-v0.5, Drive only after — see `docs/adr/0005-deferred-decisions.md`.
 - Upload conflict resolution: `(year, month)` + byte-hash — see `docs/processes.md` § Statement upload conflict resolution.
-- Default categories + direction-locked Rent/Salary — see `CONTEXT.md` § Default categories.
+- Default categories + type-locked Rent (expense) / Salary (income) — see `CONTEXT.md` § Default categories.
+- Q7 resolved: Category.type mismatch is **hard-blocked** at assignment (picker hides incompatible categories) — see `CONTEXT.md` § Invariants.

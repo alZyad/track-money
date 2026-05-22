@@ -60,21 +60,25 @@ A budgetary bucket. Default set ships with the app; user-extensible.
 type Category = {
   id: string
   name: string
-  parentId?: string                // present iff this is a subcategory
-  allowedDirection?: 'in' | 'out'  // omit for "any direction"
+  parentId?: string              // present iff this is a subcategory
+  type?: 'expense' | 'income'    // omit for "either"
 }
+
+// type ↔ Tx.direction mapping:
+//   'expense' → only Txs with direction 'out'
+//   'income'  → only Txs with direction 'in'
 ```
 
 Default categories (see `CONTEXT.md` § Default categories for semantics):
 
 ```ts
 const DEFAULT_CATEGORIES: Category[] = [
-  { id: 'rent',          name: 'Rent',          allowedDirection: 'out' },
+  { id: 'rent',          name: 'Rent',          type: 'expense' },
   { id: 'groceries',     name: 'Groceries' },
   { id: 'restaurant',    name: 'Restaurant' },
   { id: 'subscriptions', name: 'Subscriptions' },
   { id: 'transport',     name: 'Transport' },
-  { id: 'salary',        name: 'Salary',        allowedDirection: 'in' },
+  { id: 'salary',        name: 'Salary',        type: 'income' },
   { id: 'other',         name: 'Other' },
 ]
 ```
