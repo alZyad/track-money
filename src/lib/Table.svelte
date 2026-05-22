@@ -105,10 +105,10 @@
     font-weight: 500;
   }
   .num.in {
-    color: var(--accent-mint);
+    color: var(--money-in);
   }
   .num.out {
-    color: var(--accent-blush);
+    color: var(--money-out);
   }
   .badge {
     display: inline-block;
@@ -116,14 +116,14 @@
     border-radius: 999px;
     font-size: 0.72rem;
     font-weight: 500;
-    background: var(--accent-lavender-soft);
-    color: var(--accent-lavender);
+    background: var(--type-default-bg);
+    color: var(--type-default-fg);
   }
-  .badge.type-CB { background: rgba(244,201,168,0.18); color: var(--accent-peach); }
+  .badge.type-CB { background: var(--type-card-bg); color: var(--type-card-fg); }
   .badge.type-VIR_INST,
   .badge.type-VIR_SEPA,
-  .badge.type-VIREMENT { background: rgba(184,224,207,0.2); color: var(--accent-mint); }
+  .badge.type-VIREMENT { background: var(--type-transfer-bg); color: var(--type-transfer-fg); }
   .badge.type-PRLV_SEPA,
-  .badge.type-VIR_PERM { background: rgba(241,192,204,0.2); color: var(--accent-blush); }
-  .badge.type-FEE { background: rgba(255,255,255,0.06); color: var(--ink-soft); }
+  .badge.type-VIR_PERM { background: var(--type-debit-bg); color: var(--type-debit-fg); }
+  .badge.type-FEE { background: var(--type-fee-bg); color: var(--type-fee-fg); }
 </style>

@@ -63,15 +63,15 @@
   }
   .dropzone:hover {
     background: var(--surface-hover);
-    border-color: var(--accent-lavender);
+    border-color: var(--accent);
   }
   .dropzone.dragging {
-    background: var(--accent-lavender-soft);
-    border-color: var(--accent-lavender);
+    background: var(--accent-bg);
+    border-color: var(--accent);
     transform: scale(1.01);
   }
   .icon {
-    color: var(--accent-lavender);
+    color: var(--accent);
     margin-bottom: 0.875rem;
     display: flex;
     justify-content: center;
@@ -87,7 +87,7 @@
     font-size: 0.9rem;
   }
   .link {
-    color: var(--accent-lavender);
+    color: var(--accent);
     text-decoration: underline;
     text-underline-offset: 3px;
   }

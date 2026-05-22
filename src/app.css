@@ -1,19 +1,83 @@
+/* ---------------------------------------------------------------------------
+ * Theme tokens
+ *
+ * Two layers:
+ *   1. Primitives — raw color values. Never reference these from components.
+ *   2. Semantic   — purpose-named tokens that reference primitives. Components
+ *                   only use these.
+ *
+ * To create a new theme: copy the :root block, override semantic tokens (and
+ * primitives if needed) under a selector like `.theme-light`, then toggle the
+ * class on <html>. No component CSS needs to change.
+ *
+ * Palette is red-green colorblind safe (deuteran/protan/tritan):
+ *   in  = sky-blue   (Okabe-Ito #56B4E9 family)
+ *   out = amber      (Okabe-Ito #E69F00 family)
+ * These two hues are distinguishable for all common CVD types and read
+ * naturally as positive/negative without using red/green.
+ * --------------------------------------------------------------------------- */
+
 :root {
-  /* Pastel dark theme */
-  --bg: #1a1822;
-  --surface: #242131;
-  --surface-hover: #2c2939;
-  --ink: #ede9f5;
-  --ink-soft: #a8a3bc;
-  --border: #332f44;
-  --border-strong: #43405a;
+  /* ===== Primitives — raw values ===== */
+  --c-bg-0:           #1a1822;
+  --c-bg-1:           #242131;
+  --c-bg-2:           #2c2939;
+  --c-ink-100:        #ede9f5;
+  --c-ink-60:         #a8a3bc;
+  --c-line-1:         #332f44;
+  --c-line-2:         #43405a;
 
-  --accent-lavender: #c5b3e0;
-  --accent-lavender-soft: #3a3252;
-  --accent-mint: #b8e0cf;
-  --accent-peach: #f4c9a8;
-  --accent-blush: #f1c0cc;
+  /* Hue primitives (pastel, CVD-safe) */
+  --c-sky-300:        #7cc4f5;  /* in / positive */
+  --c-sky-900-a18:    rgba(124, 196, 245, 0.18);
+  --c-amber-300:      #f0b478;  /* out / negative */
+  --c-amber-900-a18:  rgba(240, 180, 120, 0.18);
+  --c-violet-300:     #c5b3e0;  /* neutral accent */
+  --c-violet-900-a18: rgba(197, 179, 224, 0.18);
+  --c-violet-900-bg:  #3a3252;
+  --c-yellow-300:     #f0d878;  /* tertiary, used sparingly */
+  --c-yellow-900-a18: rgba(240, 216, 120, 0.18);
+  --c-rose-300:       #e8a8c0;  /* used only where direction isn't the message */
+  --c-rose-900-a20:   rgba(232, 168, 192, 0.20);
 
+  /* ===== Semantic — components reference these ===== */
+
+  /* Surfaces */
+  --bg:               var(--c-bg-0);
+  --surface:          var(--c-bg-1);
+  --surface-hover:    var(--c-bg-2);
+  --border:           var(--c-line-1);
+  --border-strong:    var(--c-line-2);
+
+  /* Text */
+  --ink:              var(--c-ink-100);
+  --ink-soft:         var(--c-ink-60);
+
+  /* Money direction (CVD-safe) */
+  --money-in:         var(--c-sky-300);
+  --money-out:        var(--c-amber-300);
+
+  /* Status */
+  --status-ok:        var(--c-sky-300);
+  --status-error:     var(--c-amber-300);
+
+  /* Tx type badges */
+  --type-card-fg:        var(--c-amber-300);
+  --type-card-bg:        var(--c-amber-900-a18);
+  --type-transfer-fg:    var(--c-sky-300);
+  --type-transfer-bg:    var(--c-sky-900-a18);
+  --type-debit-fg:       var(--c-rose-300);
+  --type-debit-bg:       var(--c-rose-900-a20);
+  --type-fee-fg:         var(--c-ink-60);
+  --type-fee-bg:         rgba(255, 255, 255, 0.06);
+  --type-default-fg:     var(--c-violet-300);
+  --type-default-bg:     var(--c-violet-900-a18);
+
+  /* Accent (non-semantic uses, e.g. hover ring) */
+  --accent:              var(--c-violet-300);
+  --accent-bg:           var(--c-violet-900-bg);
+
+  /* Typography */
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
   font-size: 16px;
   line-height: 1.5;

@@ -116,7 +116,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--accent-mint);
+    background: var(--status-ok);
   }
   .name { color: var(--ink); font-weight: 500; }
   .size { color: var(--ink-soft); }
@@ -133,7 +133,7 @@
   }
   .reset:hover {
     color: var(--ink);
-    border-color: var(--accent-lavender);
+    border-color: var(--accent);
   }
   .status {
     padding: 1rem;
@@ -141,7 +141,7 @@
     color: var(--ink-soft);
   }
   .status.error {
-    color: var(--accent-blush);
+    color: var(--status-error);
   }
   .summary {
     display: grid;
