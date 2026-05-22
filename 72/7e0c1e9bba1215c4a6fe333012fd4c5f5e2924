@@ -1,0 +1,30 @@
+src/lib/workspace.svelte.ts
+  s_0815b0fbb67abb::t_62bfe715b185db 1-3,7-37,42,47-50,55-58,63-66,73-76,83-91,94,96
+src/lib/Toaster.svelte
+  s_0815b0fbb67abb::t_cb7e506c4231ec 1-44
+src/lib/toasts.svelte.ts
+  s_0815b0fbb67abb::t_34bb262ab86b70 1-32
+src/App.svelte
+  s_0815b0fbb67abb::t_4eee08509411fe 5-17,22-47,53-71,84-85,94-108,111-113,116-133,135-140,144-145,202-215
+src/lib/storage.ts
+  s_0815b0fbb67abb::t_96218988696c9d 1-145
+src/lib/types.ts
+  s_0815b0fbb67abb::t_f97072242a270f 1-2
+  s_0815b0fbb67abb::t_af44cb717202bc 28-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "727e0c1e9bba1215c4a6fe333012fd4c5f5e2924",
+  "prompts": {},
+  "sessions": {
+    "s_0815b0fbb67abb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19b612cd-574e-4866-97ef-190dbb864218",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
