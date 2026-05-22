@@ -1,3 +1,5 @@
+import type { Statement } from './parsePdf'
+
 export type CategoryType = 'expense' | 'income' | 'mixed'
 
 export type Category = {
@@ -23,3 +25,17 @@ export function acceptsDirection(cat: Category, direction: 'in' | 'out'): boolea
   if (cat.type === 'expense') return direction === 'out'
   return direction === 'in'
 }
+
+export type PersistedStatement = {
+  pdfHash: string
+  statement: Statement
+}
+
+export type PersistedWorkspace = {
+  schemaVersion: 1
+  statement: PersistedStatement | null
+  categories: Category[]
+}
+
+export const SCHEMA_VERSION = 1
+

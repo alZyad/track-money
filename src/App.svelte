@@ -2,21 +2,73 @@
   import Upload from './lib/Upload.svelte'
   import RefinementPage from './lib/RefinementPage.svelte'
   import SidePanel from './lib/SidePanel.svelte'
-  import { parseStatement, type Statement } from './lib/parsePdf'
+  import Toaster from './lib/Toaster.svelte'
+  import { parseStatement } from './lib/parsePdf'
+  import { workspace } from './lib/workspace.svelte'
+  import {
+    deletePdf,
+    hasPdf,
+    loadWorkspaceSync,
+    putPdf,
+    retry,
+    sha256Hex,
+    wipeAll,
+  } from './lib/storage'
+  import { toasts } from './lib/toasts.svelte'
 
-  let file: File | null = $state(null)
-  let statement: Statement | null = $state(null)
   let loading = $state(false)
   let error: string | null = $state(null)
   let panelOpen = $state(false)
+  let replaceMode = $state(false)
+  let booted = $state(false)
+
+  // ----- Boot hydration -----
+  $effect(() => {
+    if (booted) return
+    booted = true
+    const result = loadWorkspaceSync()
+    if (result.kind === 'ok') {
+      workspace.hydrate(result.workspace)
+      // Best-effort backup check (async; doesn't block hydration).
+      const s = result.workspace.statement
+      if (s) {
+        hasPdf(s.pdfHash).then((ok) => {
+          if (!ok) toasts.warn('PDF backup missing — data loaded but archive is gone.')
+        }).catch(() => {
+          toasts.warn('PDF backup could not be verified.')
+        })
+      }
+    } else if (result.kind === 'error') {
+      void wipeAll().finally(() => {
+        toasts.error(`Saved data couldn't be loaded (${result.reason}). Starting fresh.`)
+      })
+    }
+    workspace.enablePersistence()
+  })
 
   async function handleFile(f: File) {
-    file = f
-    statement = null
     error = null
     loading = true
     try {
-      statement = await parseStatement(f)
+      const buf = await f.arrayBuffer()
+      const parsed = await parseStatement(new Uint8Array(buf))
+      const hash = await sha256Hex(buf)
+
+      // Wipe previous backup, then write the new Workspace state, then the new blob.
+      const prevHash = workspace.statement?.pdfHash
+      if (prevHash && prevHash !== hash) {
+        try { await deletePdf(prevHash) } catch { /* best effort */ }
+      }
+      workspace.setStatement({ pdfHash: hash, statement: parsed })
+      replaceMode = false
+
+      // Write blob with 2 retries.
+      try {
+        await retry(() => putPdf(hash, f), 3)
+      } catch (e) {
+        console.error('[upload] PDF backup write failed', e)
+        toasts.error('Statement loaded but PDF backup could not be saved.')
+      }
     } catch (e) {
       error = e instanceof Error ? e.message : String(e)
       console.error(e)
@@ -29,11 +81,8 @@
     return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
   }
 
-  function reset() {
-    file = null
-    statement = null
-    error = null
-  }
+  const statement = $derived(workspace.statement?.statement ?? null)
+  const showUpload = $derived(replaceMode || statement === null)
 </script>
 
 <main>
@@ -42,49 +91,57 @@
     <p class="subtitle">Drop a bank statement, get the transactions.</p>
   </header>
 
-  {#if !file}
-    <Upload onFile={handleFile} />
-  {:else}
-    <div class="file-info">
-      <span class="dot"></span>
-      <span class="name">{file.name}</span>
-      <span class="size">{(file.size / 1024).toFixed(1)} KB</span>
-      <button class="reset" onclick={reset}>Replace</button>
-    </div>
-
+  {#if showUpload}
     {#if loading}
       <div class="status">Parsing…</div>
-    {:else if error}
-      <div class="status error">Error: {error}</div>
-    {:else if statement}
-      <section class="summary">
-        <div class="card">
-          <span class="label">Period</span>
-          <span class="value small">{statement.periodStart} → {statement.periodEnd}</span>
+    {:else}
+      <Upload onFile={handleFile} />
+      {#if replaceMode && statement}
+        <div class="cancel-row">
+          <button class="ghost" onclick={() => (replaceMode = false)}>Cancel — keep current statement</button>
         </div>
-        <div class="card">
-          <span class="label">Old balance</span>
-          <span class="value">{fmtEur(statement.oldBalance)}</span>
-        </div>
-        <div class="card">
-          <span class="label">New balance</span>
-          <span class="value">{fmtEur(statement.newBalance)}</span>
-        </div>
-        <div class="card">
-          <span class="label">Transactions</span>
-          <span class="value">{statement.txs.length}</span>
-        </div>
-      </section>
-
-      <RefinementPage
-        txs={statement.txs}
-        panelOpen={panelOpen}
-        onTogglePanel={() => (panelOpen = !panelOpen)}
-      />
-      <SidePanel txs={statement.txs} open={panelOpen} onClose={() => (panelOpen = false)} />
+      {/if}
+      {#if error}
+        <div class="status error">Error: {error}</div>
+      {/if}
     {/if}
+  {:else if statement}
+    <div class="file-info">
+      <span class="dot"></span>
+      <span class="name">{statement.periodStart} → {statement.periodEnd}</span>
+      <span class="size">{statement.txs.length} txs</span>
+      <button class="reset" onclick={() => (replaceMode = true)}>Replace</button>
+    </div>
+
+    <section class="summary">
+      <div class="card">
+        <span class="label">Period</span>
+        <span class="value small">{statement.periodStart} → {statement.periodEnd}</span>
+      </div>
+      <div class="card">
+        <span class="label">Old balance</span>
+        <span class="value">{fmtEur(statement.oldBalance)}</span>
+      </div>
+      <div class="card">
+        <span class="label">New balance</span>
+        <span class="value">{fmtEur(statement.newBalance)}</span>
+      </div>
+      <div class="card">
+        <span class="label">Transactions</span>
+        <span class="value">{statement.txs.length}</span>
+      </div>
+    </section>
+
+    <RefinementPage
+      txs={statement.txs}
+      panelOpen={panelOpen}
+      onTogglePanel={() => (panelOpen = !panelOpen)}
+    />
+    <SidePanel txs={statement.txs} open={panelOpen} onClose={() => (panelOpen = false)} />
   {/if}
 </main>
+
+<Toaster />
 
 <style>
   main {
@@ -142,6 +199,20 @@
     color: var(--ink);
     border-color: var(--accent);
   }
+  .cancel-row {
+    text-align: center;
+    margin-top: 0.75rem;
+  }
+  .ghost {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--ink-soft);
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .ghost:hover { color: var(--ink); border-color: var(--accent); }
   .status {
     padding: 1rem;
     text-align: center;
