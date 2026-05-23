@@ -1,0 +1,25 @@
+tsconfig.app.json
+  s_33e3aff5e83030::t_0a7199077479fd 8-12
+tsconfig.json
+  s_33e3aff5e83030::t_41e66f4b0b209a 3-5
+package.json
+  s_33e3aff5e83030::t_3f784e806969c4 11
+tsconfig.node.json
+  s_33e3aff5e83030::t_1b874f688cf8cc 10-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "b977e304459a0eb296f1cf0fc18688eef468f090",
+  "prompts": {},
+  "sessions": {
+    "s_33e3aff5e83030": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ac25ca6-4984-47c4-a5af-a3d607d88fc0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
