@@ -2,75 +2,13 @@
   import type { Tx } from './parsePdf'
   import type { Category } from './types'
   import { workspace } from './workspace.svelte'
-  import { categorise } from './categorise'
   import { acceptsDirection } from './types'
+  import { groupTxsByCategory } from './grouping'
 
   type Props = { txs: Tx[]; panelOpen: boolean; onTogglePanel: () => void }
   let { txs, panelOpen, onTogglePanel }: Props = $props()
 
-  type Group = {
-    key: string
-    label: string
-    type: 'expense' | 'income' | 'mixed'
-    category: Category | null  // null = Uncategorised virtual group
-    txs: Tx[]
-    totalAbs: number
-  }
-
-  const groups = $derived.by<Group[]>(() => {
-    const cats = workspace.categories
-    const buckets = new Map<string, Group>()
-
-    const ensure = (key: string, label: string, type: 'expense' | 'income' | 'mixed', category: Category | null): Group => {
-      let g = buckets.get(key)
-      if (!g) {
-        g = { key, label, type, category, txs: [], totalAbs: 0 }
-        buckets.set(key, g)
-      }
-      return g
-    }
-
-    // Pre-create uncategorised buckets so they always exist.
-    ensure('uncat-out', 'Uncategorised', 'expense', null)
-    ensure('uncat-in', 'Uncategorised', 'income', null)
-
-    for (const tx of txs) {
-      const a = categorise(tx, cats)
-      if (a.kind === 'categorised') {
-        const g = ensure(a.category.id, a.category.name, a.category.type, a.category)
-        g.txs.push(tx)
-        g.totalAbs += tx.amount
-      } else {
-        const key = tx.direction === 'out' ? 'uncat-out' : 'uncat-in'
-        const g = buckets.get(key)!
-        g.txs.push(tx)
-        g.totalAbs += tx.amount
-      }
-    }
-
-    // Sort Txs in each group: amount desc.
-    for (const g of buckets.values()) g.txs.sort((a, b) => b.amount - a.amount)
-
-    // Build the ordered list:
-    // 1. Uncategorised expense (if any), 2. Uncategorised income (if any),
-    // 3. Expense Categories (amount desc, then name asc tie-break),
-    // 4. Income Categories (same).
-    const uncatOut = buckets.get('uncat-out')!
-    const uncatIn = buckets.get('uncat-in')!
-
-    const realByType = (t: 'expense' | 'income' | 'mixed') =>
-      [...buckets.values()]
-        .filter((g) => g.category !== null && g.type === t)
-        .sort((a, b) => b.totalAbs - a.totalAbs || a.label.localeCompare(b.label))
-
-    const result: Group[] = []
-    if (uncatOut.txs.length) result.push(uncatOut)
-    if (uncatIn.txs.length) result.push(uncatIn)
-    result.push(...realByType('expense'))
-    result.push(...realByType('income'))
-    result.push(...realByType('mixed'))
-    return result
-  })
+  const groups = $derived(groupTxsByCategory(txs, workspace.categories))
 
   let selected = $state<Set<string>>(new Set())
   function txKey(tx: Tx) {
