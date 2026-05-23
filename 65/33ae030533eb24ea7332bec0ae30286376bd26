@@ -1,0 +1,21 @@
+src/lib/domain/categoryColor.ts
+  s_64f4e53799d9d8::t_88f5bcf551d8ed 1-29
+src/lib/domain/pieData.ts
+  s_64f4e53799d9d8::t_a2f2e2b18feda4 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "6533ae030533eb24ea7332bec0ae30286376bd26",
+  "prompts": {},
+  "sessions": {
+    "s_64f4e53799d9d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c527d0bb-20e3-422f-b207-56fef4532051",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
