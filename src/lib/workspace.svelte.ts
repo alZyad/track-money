@@ -2,7 +2,7 @@ import type { Category, PersistedStatement, PersistedWorkspace } from './types'
 import { DEFAULT_CATEGORIES, SCHEMA_VERSION } from './types'
 import { saveWorkspaceSync } from './storage'
 
-class WorkspaceStore {
+export class WorkspaceStore {
   categories: Category[] = $state(structuredClone(DEFAULT_CATEGORIES))
   statement: PersistedStatement | null = $state(null)
 

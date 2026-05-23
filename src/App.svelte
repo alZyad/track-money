@@ -3,18 +3,18 @@
   import RefinementPage from './lib/RefinementPage.svelte'
   import SidePanel from './lib/SidePanel.svelte'
   import Toaster from './lib/Toaster.svelte'
-  import { parseStatement } from './lib/parsePdf'
   import { workspace } from './lib/workspace.svelte'
   import {
     deletePdf,
     hasPdf,
     loadWorkspaceSync,
     putPdf,
-    retry,
-    sha256Hex,
     wipeAll,
   } from './lib/storage'
+  import { loadStatement } from './lib/loadStatement'
   import { toasts } from './lib/toasts.svelte'
+
+  const storage = { putPdf, deletePdf }
 
   let loading = $state(false)
   let error: string | null = $state(null)
@@ -49,31 +49,15 @@
   async function handleFile(f: File) {
     error = null
     loading = true
-    try {
-      const buf = await f.arrayBuffer()
-      const parsed = await parseStatement(new Uint8Array(buf))
-      const hash = await sha256Hex(buf)
-
-      // Wipe previous backup, then write the new Workspace state, then the new blob.
-      const prevHash = workspace.statement?.pdfHash
-      if (prevHash && prevHash !== hash) {
-        try { await deletePdf(prevHash) } catch { /* best effort */ }
-      }
-      workspace.setStatement({ pdfHash: hash, statement: parsed })
-      replaceMode = false
-
-      // Write blob with 2 retries.
-      try {
-        await retry(() => putPdf(hash, f), 3)
-      } catch (e) {
-        console.error('[upload] PDF backup write failed', e)
-        toasts.error('Statement loaded but PDF backup could not be saved.')
-      }
-    } catch (e) {
-      error = e instanceof Error ? e.message : String(e)
-      console.error(e)
-    } finally {
-      loading = false
+    const result = await loadStatement(f, workspace, storage)
+    loading = false
+    if (result.kind === 'parse-error') {
+      error = result.message
+      return
+    }
+    replaceMode = false
+    if (result.kind === 'ok-backup-failed') {
+      toasts.error('Statement loaded but PDF backup could not be saved.')
     }
   }
 
