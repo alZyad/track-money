@@ -1,0 +1,28 @@
+src/pages/monthly-visualization/ExpensePie.svelte
+  s_64f4e53799d9d8::t_0c3b565b4bd05d 1-45,53-75,77-91,93-142
+  s_64f4e53799d9d8::t_9c9eadb928ecb8 46-52
+  s_64f4e53799d9d8::t_58c670ac576a17 76
+  s_64f4e53799d9d8::t_d1bff662bd3dc2 92
+src/pages/monthly-visualization/MonthlyVisualizationPage.svelte
+  s_64f4e53799d9d8::t_a22f0ad10e4138 4-5,8-45,48-66,69-82,91-92
+src/pages/monthly-visualization/PieLegend.svelte
+  s_64f4e53799d9d8::t_35e5a7e4a4b094 1-66
+package.json
+  s_64f4e53799d9d8::t_586e453b935281 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "0483328ee5d85cd470f3dc1a104c916afa0ad07a",
+  "prompts": {},
+  "sessions": {
+    "s_64f4e53799d9d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c527d0bb-20e3-422f-b207-56fef4532051",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
