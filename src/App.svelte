@@ -1,6 +1,6 @@
 <script lang="ts">
   import Toaster from './lib/ui/Toaster.svelte'
-  import HomePage from './pages/HomePage.svelte'
+  import HomePage from './pages/home/HomePage.svelte'
   import { workspace, persistWorkspace } from './lib/persistence/workspace.svelte'
   import { hasPdf, loadWorkspaceSync, wipeAll } from './lib/persistence/storage'
   import { toasts } from './lib/ui/toasts.svelte'

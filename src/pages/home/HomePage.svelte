@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Upload from '../lib/ui/Upload.svelte'
+  import Upload from '../../lib/ui/Upload.svelte'
   import RefinementPage from './RefinementPage.svelte'
   import SidePanel from './SidePanel.svelte'
-  import { workspace } from '../lib/persistence/workspace.svelte'
-  import { deletePdf, putPdf } from '../lib/persistence/storage'
-  import { loadStatement } from '../lib/persistence/loadStatement'
-  import { toasts } from '../lib/ui/toasts.svelte'
+  import { workspace } from '../../lib/persistence/workspace.svelte'
+  import { deletePdf, putPdf } from '../../lib/persistence/storage'
+  import { loadStatement } from '../../lib/persistence/loadStatement'
+  import { toasts } from '../../lib/ui/toasts.svelte'
 
   const storage = { putPdf, deletePdf }
 
