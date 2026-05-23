@@ -1,0 +1,41 @@
+src/pages/RefinementPage.svelte
+  s_33e3aff5e83030::t_b2c5b2024e22d5 2
+  s_33e3aff5e83030::t_ec9751e2265078 3-5
+src/lib/parsing/parsePdf.ts
+  s_33e3aff5e83030::t_edb8b32b8fa1e7 3-4
+src/lib/domain/categorise.ts
+  s_33e3aff5e83030::t_9853f193bdaf2d 1
+src/App.svelte
+  s_33e3aff5e83030::t_9900dc98a95fbc 2-6,13-15
+src/lib/persistence/loadStatement.ts
+  s_33e3aff5e83030::t_efb530dcf6437d 1
+src/lib/persistence/workspace.svelte.ts
+  s_33e3aff5e83030::t_1a5823cb902a88 1-2
+src/pages/SidePanel.svelte
+  s_33e3aff5e83030::t_e72d2c075ba805 3-4
+  s_33e3aff5e83030::t_241b00b027e80b 2
+src/lib/domain/grouping.ts
+  s_33e3aff5e83030::t_6e2dc20dba4dd7 1
+src/lib/persistence/storage.ts
+  s_33e3aff5e83030::t_7d60272d32800c 1-2
+src/main.ts
+  s_33e3aff5e83030::t_8ae50207046c51 3
+src/lib/domain/types.ts
+  s_33e3aff5e83030::t_b910f9ac4297b1 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "05225d581268958950a59300e9b211e31402ed0d",
+  "prompts": {},
+  "sessions": {
+    "s_33e3aff5e83030": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ac25ca6-4984-47c4-a5af-a3d607d88fc0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
