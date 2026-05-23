@@ -3,7 +3,7 @@
   import RefinementPage from './lib/RefinementPage.svelte'
   import SidePanel from './lib/SidePanel.svelte'
   import Toaster from './lib/Toaster.svelte'
-  import { workspace } from './lib/workspace.svelte'
+  import { workspace, persistWorkspace } from './lib/workspace.svelte'
   import {
     deletePdf,
     hasPdf,
@@ -43,7 +43,7 @@
         toasts.error(`Saved data couldn't be loaded (${result.reason}). Starting fresh.`)
       })
     }
-    workspace.enablePersistence()
+    persistWorkspace(workspace)
   })
 
   async function handleFile(f: File) {
