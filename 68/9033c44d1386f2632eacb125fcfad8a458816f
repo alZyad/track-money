@@ -1,0 +1,25 @@
+src/pages/home/SidePanel.svelte
+  s_64f4e53799d9d8::t_60b6234f253708 2-4
+src/App.svelte
+  s_64f4e53799d9d8::t_7a659bbb7de5d4 3
+src/pages/home/HomePage.svelte
+  s_64f4e53799d9d8::t_60b6234f253708 1-199
+src/pages/home/RefinementPage.svelte
+  s_64f4e53799d9d8::t_60b6234f253708 2-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "689033c44d1386f2632eacb125fcfad8a458816f",
+  "prompts": {},
+  "sessions": {
+    "s_64f4e53799d9d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c527d0bb-20e3-422f-b207-56fef4532051",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
