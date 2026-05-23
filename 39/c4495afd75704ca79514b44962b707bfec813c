@@ -1,0 +1,21 @@
+src/App.svelte
+  s_33e3aff5e83030::t_cf3560c0219b2d 3,5,34
+src/pages/HomePage.svelte
+  s_33e3aff5e83030::t_774330693706a2 1-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "39c4495afd75704ca79514b44962b707bfec813c",
+  "prompts": {},
+  "sessions": {
+    "s_33e3aff5e83030": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ac25ca6-4984-47c4-a5af-a3d607d88fc0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
