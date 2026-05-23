@@ -1,0 +1,24 @@
+src/App.svelte
+  s_33e3aff5e83030::t_a17bc420540e90 14,17
+  s_33e3aff5e83030::t_ef09ca2edbf979 52-60
+src/lib/loadStatement.ts
+  s_33e3aff5e83030::t_7ac40fe59d6851 1-50
+src/lib/workspace.svelte.ts
+  s_33e3aff5e83030::t_d4c1c72d881b32 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "dacd979a35cefa0a7e962bbda2ea3c0ad3aa8bf4",
+  "prompts": {},
+  "sessions": {
+    "s_33e3aff5e83030": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ac25ca6-4984-47c4-a5af-a3d607d88fc0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
