@@ -124,7 +124,7 @@
       const distinctCats = new Set(m.map((x) => x.category.id))
       if (distinctCats.size < 2) continue
       const w = categorise(tx, workspace.categories)
-      if (w.kind !== 'categorised') continue
+      if (w.matcher === null) continue
       out.push({ tx, matches: m, winnerCatId: w.category.id })
     }
     return out

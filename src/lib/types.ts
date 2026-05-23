@@ -26,6 +26,25 @@ export function acceptsDirection(cat: Category, direction: 'in' | 'out'): boolea
   return direction === 'in'
 }
 
+/**
+ * Virtual sentinel Categories for Transactions no matcher matched. Not
+ * persisted; not user-editable; never shown in pickers or the side panel.
+ * The leading `__` reserves the id namespace from user input.
+ */
+export const UNCAT_EXPENSE_ID = '__uncat-expense'
+export const UNCAT_INCOME_ID = '__uncat-income'
+
+export const UNCAT_EXPENSE: Category = Object.freeze({
+  id: UNCAT_EXPENSE_ID, name: 'Uncategorised', type: 'expense', matchers: [],
+}) as Category
+export const UNCAT_INCOME: Category = Object.freeze({
+  id: UNCAT_INCOME_ID, name: 'Uncategorised', type: 'income', matchers: [],
+}) as Category
+
+export function isUncategorised(cat: Category): boolean {
+  return cat.id === UNCAT_EXPENSE_ID || cat.id === UNCAT_INCOME_ID
+}
+
 export type PersistedStatement = {
   pdfHash: string
   statement: Statement

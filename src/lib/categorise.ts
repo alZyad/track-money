@@ -1,15 +1,22 @@
 import type { Tx } from './parsePdf'
 import type { Category } from './types'
-import { acceptsDirection } from './types'
+import { UNCAT_EXPENSE, UNCAT_INCOME, acceptsDirection } from './types'
 
-export type Assignment =
-  | { kind: 'categorised'; category: Category; matcher: string }
-  | { kind: 'uncategorised' }
+/**
+ * The Category a Tx is assigned to, plus the winning matcher.
+ * `matcher` is null when the Tx is uncategorised (the assigned Category is
+ * one of the UNCAT_* sentinels).
+ */
+export type Assignment = {
+  category: Category
+  matcher: string | null
+}
 
 /**
  * Resolve which Category owns a Tx by scanning all matchers across all
  * Categories. Longest substring matcher wins. Ties broken by Category array
- * order (stable via `for…of`).
+ * order (stable via `for…of`). Falls back to the direction-appropriate
+ * UNCAT_* sentinel when nothing matches — callers always get a Category.
  */
 export function categorise(tx: Tx, categories: Category[]): Assignment {
   let best: { category: Category; matcher: string } | null = null
@@ -22,7 +29,11 @@ export function categorise(tx: Tx, categories: Category[]): Assignment {
       }
     }
   }
-  return best ? { kind: 'categorised', ...best } : { kind: 'uncategorised' }
+  if (best) return { category: best.category, matcher: best.matcher }
+  return {
+    category: tx.direction === 'out' ? UNCAT_EXPENSE : UNCAT_INCOME,
+    matcher: null,
+  }
 }
 
 /** All `(category, matcher)` pairs that match this Tx. Used for conflicts. */

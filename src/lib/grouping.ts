@@ -1,19 +1,17 @@
 import type { Tx } from './parsePdf'
 import type { Category } from './types'
+import { UNCAT_EXPENSE_ID, UNCAT_INCOME_ID, isUncategorised } from './types'
 import { categorise } from './categorise'
 
 export type Group = {
   key: string
   label: string
   type: 'expense' | 'income' | 'mixed'
-  /** null = Uncategorised virtual group. */
-  category: Category | null
+  category: Category
+  uncategorised: boolean
   txs: Tx[]
   totalAbs: number
 }
-
-const UNCAT_OUT_KEY = 'uncat-out'
-const UNCAT_IN_KEY = 'uncat-in'
 
 /**
  * Bucket Transactions by their matched Category. Within each group, Txs are
@@ -27,39 +25,38 @@ const UNCAT_IN_KEY = 'uncat-in'
  */
 export function groupTxsByCategory(txs: Tx[], categories: Category[]): Group[] {
   const buckets = new Map<string, Group>()
-  const ensure = (key: string, label: string, type: Group['type'], category: Category | null): Group => {
-    let g = buckets.get(key)
-    if (!g) {
-      g = { key, label, type, category, txs: [], totalAbs: 0 }
-      buckets.set(key, g)
-    }
-    return g
-  }
-
-  ensure(UNCAT_OUT_KEY, 'Uncategorised', 'expense', null)
-  ensure(UNCAT_IN_KEY, 'Uncategorised', 'income', null)
-
   for (const tx of txs) {
-    const a = categorise(tx, categories)
-    const g = a.kind === 'categorised'
-      ? ensure(a.category.id, a.category.name, a.category.type, a.category)
-      : buckets.get(tx.direction === 'out' ? UNCAT_OUT_KEY : UNCAT_IN_KEY)!
+    const { category } = categorise(tx, categories)
+    let g = buckets.get(category.id)
+    if (!g) {
+      g = {
+        key: category.id,
+        label: category.name,
+        type: category.type,
+        category,
+        uncategorised: isUncategorised(category),
+        txs: [],
+        totalAbs: 0,
+      }
+      buckets.set(category.id, g)
+    }
     g.txs.push(tx)
     g.totalAbs += tx.amount
   }
 
   for (const g of buckets.values()) g.txs.sort((a, b) => b.amount - a.amount)
 
+  const result: Group[] = []
+  const uncatOut = buckets.get(UNCAT_EXPENSE_ID)
+  const uncatIn = buckets.get(UNCAT_INCOME_ID)
+  if (uncatOut) result.push(uncatOut)
+  if (uncatIn) result.push(uncatIn)
+
   const realByType = (t: Group['type']) =>
     [...buckets.values()]
-      .filter((g) => g.category !== null && g.type === t)
+      .filter((g) => !g.uncategorised && g.type === t)
       .sort((a, b) => b.totalAbs - a.totalAbs || a.label.localeCompare(b.label))
 
-  const uncatOut = buckets.get(UNCAT_OUT_KEY)!
-  const uncatIn = buckets.get(UNCAT_IN_KEY)!
-  const result: Group[] = []
-  if (uncatOut.txs.length) result.push(uncatOut)
-  if (uncatIn.txs.length) result.push(uncatIn)
   result.push(...realByType('expense'))
   result.push(...realByType('income'))
   result.push(...realByType('mixed'))

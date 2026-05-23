@@ -152,11 +152,11 @@
 
 <div class="groups">
   {#each groups as g (g.key)}
-    <section class="group" class:uncat={g.category === null}>
+    <section class="group" class:uncat={g.uncategorised}>
       <header class="group-header">
         <span class="group-label">
           {g.label}
-          {#if g.category === null}
+          {#if g.uncategorised}
             <span class="dir-tag">{g.type}</span>
           {:else if g.type === 'mixed'}
             <span class="dir-tag">mixed</span>
