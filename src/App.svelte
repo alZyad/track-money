@@ -32,10 +32,9 @@
       // Best-effort backup check (async; doesn't block hydration).
       const s = result.workspace.statement
       if (s) {
-        hasPdf(s.pdfHash).then((ok) => {
-          if (!ok) toasts.warn('PDF backup missing — data loaded but archive is gone.')
-        }).catch(() => {
-          toasts.warn('PDF backup could not be verified.')
+        hasPdf(s.pdfHash).then((r) => {
+          if (!r.ok) toasts.warn('PDF backup could not be verified.')
+          else if (!r.value) toasts.warn('PDF backup missing — data loaded but archive is gone.')
         })
       }
     } else if (result.kind === 'error') {
@@ -57,7 +56,12 @@
     }
     replaceMode = false
     if (result.kind === 'ok-backup-failed') {
-      toasts.error('Statement loaded but PDF backup could not be saved.')
+      const msg = result.reason === 'quota'
+        ? 'Statement loaded — PDF backup skipped (browser storage full).'
+        : result.reason === 'unsupported'
+          ? 'Statement loaded — PDF backup unavailable (IndexedDB blocked).'
+          : 'Statement loaded but PDF backup could not be saved.'
+      toasts.error(msg)
     }
   }
 

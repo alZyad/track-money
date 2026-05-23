@@ -1,16 +1,17 @@
 import { parseStatement } from './parsePdf'
-import { sha256Hex, retry } from './storage'
+import { retryIdb, sha256Hex } from './storage'
+import type { IdbFailReason, IdbResult } from './storage'
 import type { WorkspaceStore } from './workspace.svelte'
 
 export type StorageAdapter = {
-  putPdf: (hash: string, blob: Blob) => Promise<void>
-  deletePdf: (hash: string) => Promise<void>
+  putPdf: (hash: string, blob: Blob) => Promise<IdbResult<void>>
+  deletePdf: (hash: string) => Promise<IdbResult<void>>
 }
 
 export type LoadResult =
   | { kind: 'ok' }
   | { kind: 'parse-error'; message: string }
-  | { kind: 'ok-backup-failed' }
+  | { kind: 'ok-backup-failed'; reason: IdbFailReason }
 
 /**
  * Choreographs ingestion of a new Statement PDF:
@@ -36,15 +37,12 @@ export async function loadStatement(
 
   const prev = workspace.statement?.pdfHash
   if (prev && prev !== hash) {
-    try { await storage.deletePdf(prev) } catch { /* best effort */ }
+    await storage.deletePdf(prev) // best effort; result ignored
   }
   workspace.setStatement({ pdfHash: hash, statement: parsed })
 
-  try {
-    await retry(() => storage.putPdf(hash, file), 3)
-    return { kind: 'ok' }
-  } catch (e) {
-    console.error('[loadStatement] backup write failed', e)
-    return { kind: 'ok-backup-failed' }
-  }
+  const r = await retryIdb(() => storage.putPdf(hash, file), 3)
+  if (r.ok) return { kind: 'ok' }
+  console.error('[loadStatement] backup write failed', r.reason, r.error)
+  return { kind: 'ok-backup-failed', reason: r.reason }
 }
