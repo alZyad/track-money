@@ -1,4 +1,21 @@
-import type { Statement } from './parsePdf'
+import type { TxType } from './txRules'
+
+export type Tx = {
+  date: string
+  type: TxType
+  transactionIdentifier: string
+  transactionRaw: string
+  amount: number
+  direction: 'in' | 'out'
+}
+
+export type Statement = {
+  periodStart: string
+  periodEnd: string
+  oldBalance: number
+  newBalance: number
+  txs: Tx[]
+}
 
 export type CategoryType = 'expense' | 'income' | 'mixed'
 

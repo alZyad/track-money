@@ -1,5 +1,4 @@
-import type { Tx } from './parsePdf'
-import type { Category } from './types'
+import type { Category, Tx } from './types'
 import { UNCAT_EXPENSE, UNCAT_INCOME, acceptsDirection } from './types'
 
 /**

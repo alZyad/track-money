@@ -1,8 +1,7 @@
 <script lang="ts">
-  import type { Tx } from './parsePdf'
-  import type { Category, CategoryType } from './types'
-  import { workspace } from './workspace.svelte'
-  import { allMatches, categorise, validateMatcher } from './categorise'
+  import type { Category, CategoryType, Tx } from '../lib/domain/types'
+  import { workspace } from '../lib/persistence/workspace.svelte'
+  import { allMatches, categorise, validateMatcher } from '../lib/domain/categorise'
 
   type Props = { txs: Tx[]; open: boolean; onClose: () => void }
   let { txs, open, onClose }: Props = $props()

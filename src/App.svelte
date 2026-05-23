@@ -1,18 +1,18 @@
 <script lang="ts">
-  import Upload from './lib/Upload.svelte'
-  import RefinementPage from './lib/RefinementPage.svelte'
-  import SidePanel from './lib/SidePanel.svelte'
-  import Toaster from './lib/Toaster.svelte'
-  import { workspace, persistWorkspace } from './lib/workspace.svelte'
+  import Upload from './lib/ui/Upload.svelte'
+  import RefinementPage from './pages/RefinementPage.svelte'
+  import SidePanel from './pages/SidePanel.svelte'
+  import Toaster from './lib/ui/Toaster.svelte'
+  import { workspace, persistWorkspace } from './lib/persistence/workspace.svelte'
   import {
     deletePdf,
     hasPdf,
     loadWorkspaceSync,
     putPdf,
     wipeAll,
-  } from './lib/storage'
-  import { loadStatement } from './lib/loadStatement'
-  import { toasts } from './lib/toasts.svelte'
+  } from './lib/persistence/storage'
+  import { loadStatement } from './lib/persistence/loadStatement'
+  import { toasts } from './lib/ui/toasts.svelte'
 
   const storage = { putPdf, deletePdf }
 

@@ -1,5 +1,5 @@
-import type { PersistedWorkspace } from './types'
-import { SCHEMA_VERSION } from './types'
+import type { PersistedWorkspace } from '../domain/types'
+import { SCHEMA_VERSION } from '../domain/types'
 
 const LS_KEY = 'track-money:workspace'
 const IDB_NAME = 'track-money'

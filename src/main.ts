@@ -1,6 +1,6 @@
 import { mount } from 'svelte'
 import './app.css'
-import './lib/pdfWorker'
+import './lib/parsing/pdfWorker'
 import App from './App.svelte'
 
 const app = mount(App, {

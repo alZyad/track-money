@@ -1,5 +1,5 @@
-import type { Category, PersistedStatement, PersistedWorkspace } from './types'
-import { DEFAULT_CATEGORIES, SCHEMA_VERSION } from './types'
+import type { Category, PersistedStatement, PersistedWorkspace } from '../domain/types'
+import { DEFAULT_CATEGORIES, SCHEMA_VERSION } from '../domain/types'
 import { saveWorkspaceSync } from './storage'
 
 export class WorkspaceStore {

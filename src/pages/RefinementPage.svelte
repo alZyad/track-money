@@ -1,9 +1,8 @@
 <script lang="ts">
-  import type { Tx } from './parsePdf'
-  import type { Category } from './types'
-  import { workspace } from './workspace.svelte'
-  import { acceptsDirection } from './types'
-  import { groupTxsByCategory } from './grouping'
+  import type { Category, Tx } from '../lib/domain/types'
+  import { workspace } from '../lib/persistence/workspace.svelte'
+  import { acceptsDirection } from '../lib/domain/types'
+  import { groupTxsByCategory } from '../lib/domain/grouping'
 
   type Props = { txs: Tx[]; panelOpen: boolean; onTogglePanel: () => void }
   let { txs, panelOpen, onTogglePanel }: Props = $props()

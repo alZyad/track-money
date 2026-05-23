@@ -1,26 +1,7 @@
 import type { PdfjsLike } from './pdfTransport'
 import { classify, defaultPdfjs, findColumns, groupRows, joinStr, loadItems } from './pdfTransport'
-import type { TxType } from './txRules'
-import { buildIdentifier, detectType, extractBankMemo, extractCounterparty } from './txRules'
-
-export type { TxType } from './txRules'
-
-export type Tx = {
-  date: string
-  type: TxType
-  transactionIdentifier: string
-  transactionRaw: string
-  amount: number
-  direction: 'in' | 'out'
-}
-
-export type Statement = {
-  periodStart: string
-  periodEnd: string
-  oldBalance: number
-  newBalance: number
-  txs: Tx[]
-}
+import type { Statement, Tx } from '../domain/types'
+import { buildIdentifier, detectType, extractBankMemo, extractCounterparty } from '../domain/txRules'
 
 const DATE_RE = /^\d{2}\.\d{2}$/
 const VDATE_RE = /^\d{2}\.\d{2}\.\d{2}$/

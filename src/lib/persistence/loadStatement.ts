@@ -1,4 +1,4 @@
-import { parseStatement } from './parsePdf'
+import { parseStatement } from '../parsing/parsePdf'
 import { retryIdb, sha256Hex } from './storage'
 import type { IdbFailReason, IdbResult } from './storage'
 import type { WorkspaceStore } from './workspace.svelte'

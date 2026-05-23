@@ -1,5 +1,4 @@
-import type { Tx } from './parsePdf'
-import type { Category } from './types'
+import type { Category, Tx } from './types'
 import { UNCAT_EXPENSE_ID, UNCAT_INCOME_ID, isUncategorised } from './types'
 import { categorise } from './categorise'
 
