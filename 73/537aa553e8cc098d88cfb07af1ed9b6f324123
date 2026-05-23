@@ -1,0 +1,23 @@
+src/pages/monthly-visualization/DrillSection.svelte
+  s_64f4e53799d9d8::t_db7e310f410523 1-113
+src/pages/monthly-visualization/MonthlyVisualizationPage.svelte
+  s_64f4e53799d9d8::t_bbd65639661fde 4,7
+  s_64f4e53799d9d8::t_d5b4376c116766 78-85
+  s_64f4e53799d9d8::t_27cf0f6914e581 30-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "73537aa553e8cc098d88cfb07af1ed9b6f324123",
+  "prompts": {},
+  "sessions": {
+    "s_64f4e53799d9d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c527d0bb-20e3-422f-b207-56fef4532051",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
