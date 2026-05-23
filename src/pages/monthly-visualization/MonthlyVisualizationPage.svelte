@@ -1,8 +1,10 @@
 <script lang="ts">
   import { workspace } from '../../lib/persistence/workspace.svelte'
   import { expensePieSlices } from '../../lib/domain/pieData'
+  import { categorise } from '../../lib/domain/categorise'
   import ExpensePie from './ExpensePie.svelte'
   import PieLegend from './PieLegend.svelte'
+  import DrillSection from './DrillSection.svelte'
 
   const txs = $derived(workspace.statement?.statement.txs ?? [])
   const allSlices = $derived(expensePieSlices(txs, workspace.categories))
@@ -24,6 +26,16 @@
   const visibleSlices = $derived(allSlices.filter((s) => selectedIds.has(s.categoryId)))
   const visibleTotal = $derived(visibleSlices.reduce((acc, s) => acc + s.value, 0))
   const allTotal = $derived(allSlices.reduce((acc, s) => acc + s.value, 0))
+
+  const drilled = $derived.by(() => {
+    if (!drilledId) return null
+    const slice = allSlices.find((s) => s.categoryId === drilledId)
+    if (!slice) return null
+    const drillTxs = txs
+      .filter((t) => categorise(t, workspace.categories).category.id === drilledId)
+      .sort((a, b) => b.date.localeCompare(a.date))
+    return { slice, txs: drillTxs }
+  })
 
   function fmtEur(n: number) {
     return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
@@ -63,6 +75,14 @@
       <PieLegend slices={allSlices} selectedIds={selectedIds} onToggle={toggle} />
     </div>
   </section>
+  {#if drilled}
+    <DrillSection
+      label={drilled.slice.label}
+      color={drilled.slice.color}
+      txs={drilled.txs}
+      onClose={() => (drilledId = null)}
+    />
+  {/if}
 {/if}
 
 <style>
