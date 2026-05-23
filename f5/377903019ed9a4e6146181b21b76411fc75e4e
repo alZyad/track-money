@@ -1,0 +1,23 @@
+src/lib/pdfTransport.ts
+  s_33e3aff5e83030::t_c575a5202d87a6 1-121
+src/lib/txRules.ts
+  s_33e3aff5e83030::t_1ca575e37c9d25 1-67
+src/lib/parsePdf.ts
+  s_33e3aff5e83030::t_171cd4097c95a1 1-4,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "f5377903019ed9a4e6146181b21b76411fc75e4e",
+  "prompts": {},
+  "sessions": {
+    "s_33e3aff5e83030": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ac25ca6-4984-47c4-a5af-a3d607d88fc0",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "alZyad <zyad.alalgui@theodo.com>"
+    }
+  }
+}
