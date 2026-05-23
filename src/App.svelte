@@ -1,6 +1,7 @@
 <script lang="ts">
   import Toaster from './lib/ui/Toaster.svelte'
   import HomePage from './pages/home/HomePage.svelte'
+  import MonthlyVisualizationPage from './pages/monthly-visualization/MonthlyVisualizationPage.svelte'
   import Upload from './lib/ui/Upload.svelte'
   import { workspace, persistWorkspace } from './lib/persistence/workspace.svelte'
   import { deletePdf, hasPdf, loadWorkspaceSync, putPdf, wipeAll } from './lib/persistence/storage'
@@ -129,7 +130,7 @@
     {#if route.current === 'home'}
       <HomePage />
     {:else if route.current === 'monthly-visualization'}
-      <div class="page-placeholder">Monthly visualization — coming next commit.</div>
+      <MonthlyVisualizationPage />
     {/if}
   {/if}
 </main>
@@ -263,13 +264,5 @@
   .tab.active {
     color: var(--ink);
     border-bottom-color: var(--accent);
-  }
-  .page-placeholder {
-    padding: 3rem 1rem;
-    text-align: center;
-    color: var(--ink-soft);
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: 12px;
   }
 </style>
